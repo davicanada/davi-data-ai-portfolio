@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# production
+build/
+
+# local environment
+.env*
+!.env.example
+
+# Vercel
+.vercel/
+
+# editor / OS
+.DS_Store
+Thumbs.db
+*.log
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Local agent instructions
+AGENTS.md
+CLAUDE.md
