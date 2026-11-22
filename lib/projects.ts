@@ -149,7 +149,6 @@ export const projects: Project[] = [
       "HTML/CSS",
       "Wix",
       "CSV",
-      "Playwright",
     ],
     visual: "reconcile",
     accent: "blue",
