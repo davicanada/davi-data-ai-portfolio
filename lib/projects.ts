@@ -10,7 +10,7 @@ export type ProjectCategory = Exclude<ProjectFilter, "All">;
 
 export type ProjectVisual =
   | "focus"
-  | "agent"
+  | "reconcile"
   | "battery"
   | "excel";
 
@@ -45,11 +45,19 @@ export type Project = {
     description: string;
     url: string;
   };
+  video?: {
+    src: string;
+    poster: string;
+    label: string;
+    title: string;
+    description: string;
+  };
 };
 
 type ProjectTranslation = Pick<Project, "shortTitle" | "title" | "kicker" | "status" | "summary" | "metrics" | "problem" | "approach" | "built" | "architecture" | "decisions" | "result" | "next"> & {
   links?: Array<{ label: string }>;
   embed?: { title: string; description: string };
+  video?: { label: string; title: string; description: string };
 };
 
 import type { Locale } from "@/lib/i18n";
@@ -126,80 +134,82 @@ export const projects: Project[] = [
     links: [],
   },
   {
-    slug: "job-hunter-agent",
-    shortTitle: "Job Hunter Agent",
-    title: "An AI pipeline that ranks opportunities and prepares applications",
-    kicker: "Python · AI workflow automation",
-    status: "Historical scheduled workflow",
+    slug: "catalog-reconciliation",
+    shortTitle: "Catalog Reconciliation - ERP vs Online Store",
+    title: "Finding SKU and price gaps between the ERP and the online stores",
+    kicker: "Oracle NetSuite · Data quality",
+    status: "Demo with sample data",
     summary:
-      "A Python workflow that gathers remote data jobs, removes duplicates, evaluates fit with several AI providers, prepares tailored documents and sends the strongest matches to Telegram.",
-    categories: ["Data Engineering", "Applied AI"],
+      "A page inside the ERP that compares every product in the online stores with the ERP catalog. It finds SKU and price gaps, ranks them by urgency and says what to fix before the two systems are synced. In this example, the ERP is Oracle NetSuite and the online stores run on Wix.",
+    categories: ["Analytics", "Data Engineering"],
     tools: [
-      "Python",
-      "Supabase",
-      "GitHub Actions",
-      "Gemini",
-      "Groq",
-      "OpenRouter",
-      "Telegram",
-      "python-docx",
+      "Oracle NetSuite",
+      "SuiteScript 2.1",
+      "JavaScript",
+      "HTML/CSS",
+      "Wix",
+      "CSV",
+      "Playwright",
     ],
-    visual: "agent",
+    visual: "reconcile",
     accent: "blue",
     metrics: [
-      { value: "236", label: "historical workflow runs" },
-      { value: "220", label: "successful runs" },
-      { value: "142", label: "tests in the latest run" },
-      { value: "3", label: "AI provider groups" },
+      { value: "10", label: "SKU matching steps" },
+      { value: "3", label: "severity levels" },
+      { value: "USD · CAD · EUR", label: "prices compared per storefront" },
+      { value: "Saved", label: "reviews with a reason" },
     ],
     problem:
-      "Searching for relevant jobs means visiting several sources, reviewing repeated listings and preparing the same documents again and again. I wanted one workflow that could handle those steps and keep a clear record of every result.",
+      "The ERP and the online stores were not connected. New items were created in the ERP and then typed again by hand in each store, in several languages and currencies. Over time, SKUs and prices drifted apart, and the only check was a yearly manual comparison.",
     approach:
-      "The workflow applies simple rules before calling an AI model, stores every stage in Supabase and tries another provider when the first one is unavailable.",
+      "I built the check inside the ERP, where the item data already lives. The page reads the store exports, matches each store SKU with an ERP item using a fixed set of rules, compares the price in the right currency and sorts every finding by urgency. Each row says what is wrong and what to do.",
     built: [
-      "Async adapters for multiple job feeds with in-batch and database deduplication.",
-      "Heuristic prefiltering before LLM scoring to control cost and noise.",
-      "A Gemini, Groq and OpenRouter fallback sequence with usage-limit tracking.",
-      "Token, latency, success, and error telemetry for every model attempt.",
-      "Tailored résumés and cover letters rendered to DOCX with atomic writes.",
-      "Telegram delivery and persistent notification state to prevent repeats.",
+      "A Suitelet page in SuiteScript 2.1 that reads ERP items, MPNs, alternate part numbers and Base Prices.",
+      "Ten matching steps, from the exact SKU to language suffixes, MPNs, short forms and likely typos.",
+      "Price comparison in each storefront's currency, including items sold in packs of 100.",
+      "A coverage check that finds products missing in one of the four North America storefronts.",
+      "Reviews saved in the ERP with a reason, valid only while the row stays the same.",
+      "The latest store files kept in the ERP, so the page opens with the last results.",
+      "CSV export of the filtered list for the people who update the stores.",
     ],
     architecture: [
-      "Remote job sources",
-      "Async fetch + normalize",
-      "Supabase deduplication",
-      "Deterministic prefilter",
-      "LLM score + tailor",
-      "DOCX + Telegram delivery",
+      "Store product exports",
+      "ERP items and prices",
+      "SKU matching rules",
+      "Price and coverage checks",
+      "Severity and reviews",
+      "Action list and export",
     ],
     decisions: [
       {
-        title: "Use rules before AI",
+        title: "Explain every match",
         detail:
-          "Simple rules remove obvious mismatches before any model call. This saves time and makes the first stage easy to explain.",
+          "Some SKUs are written differently on purpose. The page shows why each row matched, so the team trusts the result and only acts on real problems.",
       },
       {
-        title: "Record every fallback",
+        title: "Rank by what needs action",
         detail:
-          "Provider changes, usage limits, response time and token use are recorded instead of being hidden inside a retry loop.",
+          "Findings are grouped as Fix now, Review or OK. The team starts with wrong prices and SKUs, and expected differences can be marked as reviewed.",
       },
       {
-        title: "Guard against invented résumé claims",
+        title: "Build where the data lives",
         detail:
-          "Returned highlights are checked against the structured profile; unsupported output falls back to a deterministic selection.",
+          "Running inside the ERP means no extra server, no copy of the item data and the same permissions the team already has.",
       },
     ],
     result:
-      "The project shows a complete AI automation workflow with source collection, deduplication, model monitoring, document generation and delivery.",
+      "A yearly manual comparison becomes a check that runs in seconds and can be repeated whenever a store changes. The result is one shared list of what to fix before the systems are synced.",
     next:
-      "I would add a fixed evaluation set for scoring quality, reactivate the schedule and build a small monitoring page for source results, provider reliability, cost and application outcomes.",
-    links: [
-      {
-        label: "View source",
-        href: "https://github.com/davicanada/job-hunter-agent",
-        kind: "github",
-      },
-    ],
+      "Next, I would read the stores directly through the Wix API, with read-only access and the key stored in NetSuite API Secrets, so the check can run on a schedule without file uploads.",
+    links: [],
+    video: {
+      src: "/catalog-reconciliation-demo.mp4",
+      poster: "/catalog-reconciliation-poster.jpg",
+      label: "Product demo",
+      title: "See the check in action",
+      description:
+        "A 40-second demo: loading the store exports, reviewing the problems found and exporting the action list. The company, products and prices are fictional.",
+    },
   },
   {
     slug: "battery-lifecycle-power-bi",
@@ -361,17 +371,21 @@ const projectTranslations: Partial<Record<Exclude<Locale, "en">, Record<string, 
       result: "Focus montre ma façon de travailler à la croisée du design produit, de la modélisation des données, de l'analyse et de l'IA appliquée. Il accompagne une tâche réelle de la saisie jusqu'au suivi.",
       next: "La prochaine étape consiste à terminer la vérification de sécurité, créer une école de démonstration avec des données fictives et enregistrer une courte présentation pour les recruteurs."
     },
-    "job-hunter-agent": {
-      shortTitle: "Agent de recherche d'emploi", title: "Un pipeline d'IA qui classe les offres et prépare les candidatures", kicker: "Python · Automatisation avec l'IA", status: "Flux planifié historique",
-      summary: "Un flux Python qui recueille des offres d'emploi à distance, retire les doublons, évalue la correspondance avec plusieurs fournisseurs d'IA, prépare des documents adaptés et transmet les meilleures offres dans Telegram.",
-      metrics: [{ value: "236", label: "exécutions historiques" }, { value: "220", label: "exécutions réussies" }, { value: "142", label: "tests lors de la dernière exécution" }, { value: "3", label: "groupes de fournisseurs d'IA" }],
-      problem: "Chercher des offres pertinentes exige de consulter plusieurs sources, revoir les mêmes annonces et préparer sans cesse des documents similaires. Je voulais un seul flux qui gère ces étapes et conserve un historique clair de chaque résultat.",
-      approach: "Le flux applique des règles simples avant d'appeler un modèle d'IA, enregistre chaque étape dans Supabase et essaie un autre fournisseur lorsque le premier est indisponible.",
-      built: ["Adaptateurs asynchrones pour plusieurs sources avec dédoublonnage dans le lot et la base.", "Préfiltrage par règles avant l'évaluation LLM pour limiter les coûts et le bruit.", "Chaîne de repli Gemini, Groq et OpenRouter avec suivi des limites d'utilisation.", "Télémétrie des jetons, de la latence, des réussites et des erreurs pour chaque tentative.", "CV et lettres adaptés en DOCX avec écritures atomiques.", "Envoi dans Telegram et état persistant pour éviter les avis répétés."],
-      architecture: ["Sources d'emploi", "Collecte asynchrone + normalisation", "Dédoublonnage Supabase", "Préfiltre déterministe", "Évaluation + adaptation LLM", "DOCX + envoi Telegram"],
-      decisions: [{ title: "Utiliser des règles avant l'IA", detail: "Des règles simples éliminent les incompatibilités évidentes avant tout appel au modèle. Cette étape réduit les coûts et reste facile à expliquer." }, { title: "Consigner chaque solution de repli", detail: "Les changements de fournisseur, limites d'utilisation, temps de réponse et jetons sont enregistrés plutôt que cachés dans une boucle de relance." }, { title: "Éviter les affirmations inventées", detail: "Les éléments proposés sont comparés au profil structuré; tout résultat non justifié revient à une sélection déterministe." }],
-      result: "Ce projet démontre un flux complet d'automatisation avec collecte, dédoublonnage, supervision des modèles, génération de documents et livraison.",
-      next: "J'ajouterais un jeu d'évaluation fixe, réactiverais la planification et créerais une page de suivi des sources, de la fiabilité, des coûts et des résultats.", links: [{ label: "Voir le code source" }]
+    "catalog-reconciliation": {
+      shortTitle: "Rapprochement du catalogue - ERP et boutique en ligne",
+      title: "Repérer les écarts de SKU et de prix entre l'ERP et les boutiques en ligne",
+      kicker: "Oracle NetSuite · Qualité des données",
+      status: "Démonstration avec données fictives",
+      summary: "Une page dans l'ERP qui compare chaque produit des boutiques en ligne avec le catalogue de l'ERP. Elle repère les écarts de SKU et de prix, les classe par urgence et indique quoi corriger avant de synchroniser les deux systèmes. Dans cet exemple, l'ERP est Oracle NetSuite et les boutiques en ligne utilisent Wix.",
+      metrics: [{"value": "10", "label": "étapes de correspondance des SKU"}, {"value": "3", "label": "niveaux de gravité"}, {"value": "USD · CAD · EUR", "label": "prix comparés par vitrine"}, {"value": "Enregistrées", "label": "révisions avec motif"}],
+      problem: "L'ERP et les boutiques en ligne n'étaient pas reliés. Les nouveaux articles étaient créés dans l'ERP, puis saisis de nouveau à la main dans chaque boutique, en plusieurs langues et devises. Avec le temps, les SKU et les prix se sont mis à diverger, et la seule vérification était une comparaison manuelle annuelle.",
+      approach: "J'ai construit la vérification dans l'ERP, là où se trouvent déjà les données des articles. La page lit les exports des boutiques, associe chaque SKU à un article de l'ERP selon des règles fixes, compare le prix dans la bonne devise et classe chaque constat par urgence. Chaque ligne indique le problème et l'action à prendre.",
+      built: ["Une page Suitelet en SuiteScript 2.1 qui lit les articles, MPN, numéros de pièce alternatifs et prix de base de l'ERP.", "Dix étapes de correspondance, du SKU exact aux suffixes de langue, MPN, formes courtes et fautes de frappe probables.", "Comparaison des prix dans la devise de chaque vitrine, y compris les articles vendus par paquets de 100.", "Une vérification de couverture qui repère les produits absents de l'une des quatre vitrines d'Amérique du Nord.", "Révisions enregistrées dans l'ERP avec un motif, valides tant que la ligne ne change pas.", "Les derniers fichiers des boutiques conservés dans l'ERP, pour que la page s'ouvre avec les derniers résultats.", "Export CSV de la liste filtrée pour les personnes qui mettent à jour les boutiques."],
+      architecture: ["Exports des boutiques", "Articles et prix de l'ERP", "Règles de correspondance des SKU", "Contrôles de prix et de couverture", "Gravité et révisions", "Liste d'actions et export"],
+      decisions: [{"title": "Expliquer chaque correspondance", "detail": "Certains SKU sont écrits différemment exprès. La page montre pourquoi chaque ligne correspond, afin que l'équipe fasse confiance au résultat et n'agisse que sur les vrais problèmes."}, {"title": "Classer selon l'action requise", "detail": "Les constats sont regroupés en À corriger, À revoir ou OK. L'équipe commence par les prix et SKU erronés, et les écarts prévus peuvent être marqués comme révisés."}, {"title": "Construire là où sont les données", "detail": "Fonctionner dans l'ERP évite un serveur de plus et une copie des données, et conserve les permissions que l'équipe a déjà."}],
+      result: "Une comparaison manuelle annuelle devient une vérification qui prend quelques secondes et peut être refaite dès qu'une boutique change. Le résultat est une seule liste partagée de ce qu'il faut corriger avant de synchroniser les systèmes.",
+      next: "La prochaine étape serait de lire les boutiques directement avec l'API de Wix, en lecture seule et avec la clé conservée dans les API Secrets de NetSuite, pour lancer la vérification selon un horaire sans téléverser de fichiers.",
+      video: {"label": "Démonstration du produit", "title": "Voir la vérification en action", "description": "Une démonstration de 40 secondes : chargement des exports des boutiques, examen des problèmes trouvés et export de la liste d'actions. L'entreprise, les produits et les prix sont fictifs."}
     },
     "battery-lifecycle-power-bi": {
       shortTitle: "Cycle de vie des batteries", title: "Planifier le remplacement des batteries avec Power BI", kicker: "Power BI · Planification de la maintenance", status: "Rapport interactif",
@@ -411,17 +425,21 @@ const projectTranslations: Partial<Record<Exclude<Locale, "en">, Record<string, 
       result: "Focus muestra cómo trabajo con diseño de producto, modelado de datos, análisis e IA aplicada. La solución acompaña una tarea real desde el registro hasta el seguimiento.",
       next: "El siguiente paso es terminar la revisión de seguridad, crear una escuela de demostración con datos ficticios y grabar una presentación breve para reclutadores."
     },
-    "job-hunter-agent": {
-      shortTitle: "Agente de búsqueda de empleo", title: "Un pipeline de IA que clasifica oportunidades y prepara candidaturas", kicker: "Python · Automatización con IA", status: "Flujo programado histórico",
-      summary: "Un flujo en Python que reúne empleos remotos de datos, elimina duplicados, evalúa la compatibilidad con varios proveedores de IA, prepara documentos personalizados y envía las mejores oportunidades por Telegram.",
-      metrics: [{ value: "236", label: "ejecuciones históricas" }, { value: "220", label: "ejecuciones exitosas" }, { value: "142", label: "pruebas en la última ejecución" }, { value: "3", label: "grupos de proveedores de IA" }],
-      problem: "Buscar vacantes relevantes implica visitar varias fuentes, revisar anuncios repetidos y preparar documentos similares una y otra vez. Quería un solo flujo que gestionara esas etapas y mantuviera un registro claro.",
-      approach: "El flujo aplica reglas simples antes de consultar un modelo de IA, registra cada etapa en Supabase y prueba otro proveedor cuando el primero no está disponible.",
-      built: ["Adaptadores asíncronos para varias fuentes con eliminación de duplicados.", "Prefiltro por reglas antes de la evaluación LLM para controlar coste y ruido.", "Alternativas entre Gemini, Groq y OpenRouter con seguimiento de límites.", "Telemetría de tokens, latencia, éxito y errores en cada intento.", "Currículos y cartas personalizados en DOCX con escritura atómica.", "Envío por Telegram y estado persistente para evitar notificaciones repetidas."],
-      architecture: ["Fuentes de empleo", "Recopilación asíncrona + normalización", "Eliminación de duplicados en Supabase", "Prefiltro determinista", "Evaluación + personalización LLM", "DOCX + entrega por Telegram"],
-      decisions: [{ title: "Usar reglas antes de la IA", detail: "Las reglas simples eliminan incompatibilidades evidentes antes de llamar al modelo. Esto ahorra tiempo y hace que la primera etapa sea fácil de explicar." }, { title: "Registrar cada alternativa", detail: "Los cambios de proveedor, límites, tiempos de respuesta y tokens quedan registrados en lugar de ocultarse en reintentos." }, { title: "Evitar afirmaciones inventadas", detail: "Los resultados se comparan con el perfil estructurado; cualquier elemento sin respaldo vuelve a una selección determinista." }],
-      result: "El proyecto demuestra un flujo completo de automatización con recopilación, deduplicación, monitoreo de modelos, generación de documentos y entrega.",
-      next: "Añadiría un conjunto fijo de evaluación, reactivaría la programación y crearía una página para monitorear fuentes, confiabilidad, coste y resultados.", links: [{ label: "Ver código fuente" }]
+    "catalog-reconciliation": {
+      shortTitle: "Conciliación del catálogo - ERP frente a tienda en línea",
+      title: "Encontrar diferencias de SKU y precio entre el ERP y las tiendas en línea",
+      kicker: "Oracle NetSuite · Calidad de datos",
+      status: "Demo con datos de ejemplo",
+      summary: "Una página dentro del ERP que compara cada producto de las tiendas en línea con el catálogo del ERP. Detecta diferencias de SKU y de precio, las ordena por urgencia e indica qué corregir antes de sincronizar los dos sistemas. En este ejemplo, el ERP es Oracle NetSuite y las tiendas en línea funcionan con Wix.",
+      metrics: [{"value": "10", "label": "pasos para cruzar SKU"}, {"value": "3", "label": "niveles de gravedad"}, {"value": "USD · CAD · EUR", "label": "precios comparados por tienda"}, {"value": "Guardadas", "label": "revisiones con motivo"}],
+      problem: "El ERP y las tiendas en línea no estaban conectados. Los artículos nuevos se creaban en el ERP y luego se volvían a escribir a mano en cada tienda, en varios idiomas y monedas. Con el tiempo, los SKU y los precios dejaron de coincidir, y la única revisión era una comparación manual anual.",
+      approach: "Construí la revisión dentro del ERP, donde ya están los datos de los artículos. La página lee las exportaciones de las tiendas, cruza cada SKU con un artículo del ERP mediante reglas fijas, compara el precio en la moneda correcta y ordena cada hallazgo por urgencia. Cada fila indica el problema y qué hacer.",
+      built: ["Una página Suitelet en SuiteScript 2.1 que lee artículos, MPN, números de parte alternativos y precios base del ERP.", "Diez pasos de cruce, desde el SKU exacto hasta sufijos de idioma, MPN, formas cortas y posibles errores de escritura.", "Comparación de precios en la moneda de cada tienda, incluidos los artículos que se venden en paquetes de 100.", "Una revisión de cobertura que detecta productos que faltan en alguna de las cuatro tiendas de América del Norte.", "Revisiones guardadas en el ERP con un motivo, válidas solo mientras la fila no cambie.", "Los últimos archivos de las tiendas guardados en el ERP, para que la página abra con los últimos resultados.", "Exportación CSV de la lista filtrada para quienes actualizan las tiendas."],
+      architecture: ["Exportaciones de las tiendas", "Artículos y precios del ERP", "Reglas de cruce de SKU", "Revisión de precios y cobertura", "Gravedad y revisiones", "Lista de acciones y exportación"],
+      decisions: [{"title": "Explicar cada cruce", "detail": "Algunos SKU se escriben distinto a propósito. La página muestra por qué coincide cada fila, para que el equipo confíe en el resultado y actúe solo sobre problemas reales."}, {"title": "Ordenar por lo que requiere acción", "detail": "Los hallazgos se agrupan en Corregir, Revisar u OK. El equipo empieza por precios y SKU incorrectos, y las diferencias esperadas se pueden marcar como revisadas."}, {"title": "Construir donde están los datos", "detail": "Funcionar dentro del ERP evita otro servidor y otra copia de los datos, y mantiene los permisos que el equipo ya tiene."}],
+      result: "Una comparación manual anual se convierte en una revisión que tarda segundos y se puede repetir cada vez que cambia una tienda. El resultado es una sola lista compartida de lo que hay que corregir antes de sincronizar los sistemas.",
+      next: "El siguiente paso sería leer las tiendas directamente con la API de Wix, con acceso de solo lectura y la clave guardada en NetSuite API Secrets, para que la revisión se ejecute de forma programada sin subir archivos.",
+      video: {"label": "Demo del producto", "title": "Mira la revisión en acción", "description": "Una demo de 40 segundos: carga de las exportaciones de las tiendas, revisión de los problemas encontrados y exportación de la lista de acciones. La empresa, los productos y los precios son ficticios."}
     },
     "battery-lifecycle-power-bi": {
       shortTitle: "Ciclo de vida de baterías", title: "Planificación del reemplazo de baterías con Power BI", kicker: "Power BI · Planificación de mantenimiento", status: "Informe interactivo",
@@ -461,18 +479,21 @@ const projectTranslations: Partial<Record<Exclude<Locale, "en">, Record<string, 
       result: "O Focus mostra como trabalho com design de produto, modelagem de dados, análise e IA aplicada. A solução acompanha uma tarefa operacional real desde o registro até o encerramento.",
       next: "O próximo passo é concluir a revisão de segurança, criar uma escola de demonstração com dados fictícios e gravar uma apresentação curta para recrutadores."
     },
-    "job-hunter-agent": {
-      shortTitle: "Agente de Busca de Vagas", title: "Um pipeline de IA que classifica oportunidades e prepara candidaturas", kicker: "Python · Automação de fluxos com IA", status: "Fluxo agendado histórico",
-      summary: "Um fluxo em Python que coleta vagas remotas de dados, remove duplicidades, avalia a compatibilidade com vários provedores de IA, prepara documentos personalizados e envia as melhores oportunidades pelo Telegram.",
-      metrics: [{ value: "236", label: "execuções históricas" }, { value: "220", label: "execuções bem-sucedidas" }, { value: "142", label: "testes na última execução" }, { value: "3", label: "grupos de provedores de IA" }],
-      problem: "Buscar vagas relevantes exige visitar várias fontes, revisar anúncios repetidos e preparar os mesmos documentos diversas vezes. Eu queria um único fluxo que cuidasse dessas etapas e mantivesse um registro claro de cada resultado.",
-      approach: "O fluxo aplica regras simples antes de consultar um modelo de IA, registra cada etapa no Supabase e tenta outro provedor quando o primeiro está indisponível.",
-      built: ["Adaptadores assíncronos para várias fontes de vagas, com remoção de duplicidades no lote e no banco.", "Pré-filtro por regras antes da avaliação por LLM para controlar custo e ruído.", "Sequência de alternativas entre Gemini, Groq e OpenRouter com controle de limites de uso.", "Telemetria de tokens, latência, sucesso e erro para cada tentativa.", "Currículos e cartas personalizados em DOCX com gravação atômica.", "Envio pelo Telegram e estado persistente das notificações para evitar repetições."],
-      architecture: ["Fontes de vagas remotas", "Coleta assíncrona + padronização", "Remoção de duplicidades no Supabase", "Pré-filtro determinístico", "Avaliação + personalização por LLM", "DOCX + envio pelo Telegram"],
-      decisions: [{ title: "Usar regras antes da IA", detail: "Regras simples eliminam incompatibilidades óbvias antes de qualquer chamada ao modelo. Isso economiza tempo e deixa a primeira etapa fácil de explicar." }, { title: "Registrar cada alternativa", detail: "Mudanças de provedor, limites de uso, tempo de resposta e consumo de tokens são registrados em vez de ficarem escondidos em tentativas automáticas." }, { title: "Evitar informações inventadas no currículo", detail: "Os destaques retornados são comparados ao perfil estruturado; resultados sem suporte voltam para uma seleção determinística." }],
-      result: "O projeto demonstra um fluxo completo de automação com IA, incluindo coleta, remoção de duplicidades, monitoramento dos modelos, geração de documentos e entrega.",
-      next: "Eu adicionaria um conjunto fixo de avaliação da qualidade, reativaria o agendamento e criaria uma página de monitoramento para fontes, confiabilidade, custo e resultados das candidaturas.",
-      links: [{ label: "Ver código-fonte" }]
+    "catalog-reconciliation": {
+      shortTitle: "Conciliação de catálogo - ERP vs loja online",
+      title: "Encontrando diferenças de SKU e preço entre o ERP e as lojas online",
+      kicker: "Oracle NetSuite · Qualidade de dados",
+      status: "Demonstração com dados fictícios",
+      summary: "Uma página dentro do ERP que compara cada produto das lojas online com o catálogo do ERP. Ela encontra diferenças de SKU e de preço, organiza por urgência e mostra o que corrigir antes de sincronizar os dois sistemas. Neste exemplo, o ERP é o Oracle NetSuite e as lojas online usam Wix.",
+      metrics: [{"value": "10", "label": "etapas de correspondência de SKU"}, {"value": "3", "label": "níveis de severidade"}, {"value": "USD · CAD · EUR", "label": "preços comparados por vitrine"}, {"value": "Salvas", "label": "revisões com motivo"}],
+      problem: "O ERP e as lojas online não eram conectados. Os itens novos eram criados no ERP e depois digitados de novo, à mão, em cada loja, em vários idiomas e moedas. Com o tempo, SKUs e preços ficaram diferentes, e a única verificação era uma comparação manual feita uma vez por ano.",
+      approach: "Construí a verificação dentro do ERP, onde os dados dos itens já estão. A página lê as exportações das lojas, liga cada SKU a um item do ERP com um conjunto fixo de regras, compara o preço na moeda certa e organiza cada resultado por urgência. Cada linha diz o que está errado e o que fazer.",
+      built: ["Uma página Suitelet em SuiteScript 2.1 que lê itens, MPNs, part numbers alternativos e preços base do ERP.", "Dez etapas de correspondência, do SKU exato a sufixos de idioma, MPNs, formas curtas e prováveis erros de digitação.", "Comparação de preços na moeda de cada vitrine, incluindo itens vendidos em pacotes de 100.", "Uma verificação de cobertura que encontra produtos faltando em uma das quatro vitrines da América do Norte.", "Revisões salvas no ERP com um motivo, válidas só enquanto a linha não mudar.", "Os últimos arquivos das lojas guardados no ERP, para a página abrir com os últimos resultados.", "Exportação em CSV da lista filtrada para quem atualiza as lojas."],
+      architecture: ["Exportações das lojas", "Itens e preços do ERP", "Regras de correspondência de SKU", "Verificação de preço e cobertura", "Severidade e revisões", "Lista de ações e exportação"],
+      decisions: [{"title": "Explicar cada correspondência", "detail": "Alguns SKUs são escritos de outro jeito de propósito. A página mostra por que cada linha foi ligada a um item, para a equipe confiar no resultado e agir só nos problemas reais."}, {"title": "Organizar pelo que precisa de ação", "detail": "Os resultados ficam em Corrigir, Revisar ou OK. A equipe começa pelos preços e SKUs errados, e as diferenças esperadas podem ser marcadas como revisadas."}, {"title": "Construir onde os dados estão", "detail": "Rodar dentro do ERP evita outro servidor e outra cópia dos dados, e mantém as permissões que a equipe já tem."}],
+      result: "Uma comparação manual anual vira uma verificação que leva segundos e pode ser repetida sempre que uma loja muda. O resultado é uma única lista compartilhada do que corrigir antes de sincronizar os sistemas.",
+      next: "O próximo passo seria ler as lojas direto pela API do Wix, com acesso somente leitura e a chave guardada no NetSuite API Secrets, para a verificação rodar de forma agendada, sem upload de arquivos.",
+      video: {"label": "Demonstração do produto", "title": "Veja a verificação funcionando", "description": "Uma demonstração de 40 segundos: carregar as exportações das lojas, revisar os problemas encontrados e exportar a lista de ações. A empresa, os produtos e os preços são fictícios."}
     },
     "battery-lifecycle-power-bi": {
       shortTitle: "Ciclo de Vida das Baterias", title: "Planejamento da substituição de baterias com Power BI", kicker: "Power BI · Planejamento de manutenção", status: "Relatório interativo",
@@ -511,6 +532,7 @@ function translateProject(project: Project, locale: Locale): Project {
     ...project, ...translation,
     links: project.links.map((link, index) => ({ ...link, label: translation.links?.[index]?.label ?? link.label })),
     embed: project.embed && translation.embed ? { ...project.embed, ...translation.embed } : project.embed,
+    video: project.video && translation.video ? { ...project.video, ...translation.video } : project.video,
   };
 }
 

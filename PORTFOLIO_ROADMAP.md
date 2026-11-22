@@ -26,7 +26,7 @@ This makes Data Analyst, Data Engineer, and Applied AI roles feel like one progr
 - Replace the profile README link to the private tag-decommission-site repository with this portfolio or a sanitized public case study.
 - Replace “Aspiring Data Engineer” with the same end-to-end positioning used on the website.
 - Separate “demonstrated in public projects” tools from “currently learning” tools.
-- Pin Focus, Job Hunter Agent, School Management SQL, and one polished dashboard repository.
+- Pin Focus, School Management SQL, and one polished dashboard repository. Catalog Reconciliation stays private because it was built on company data; the case study uses a demo with sample data.
 - Give every pinned repository a working homepage, one screenshot, a concise outcome-first README, setup steps, and explicit limitations.
 
 ## Short video strategy
@@ -55,12 +55,10 @@ Recommended 60-second structure:
 - Architecture: Next.js → PostgreSQL/RLS → ECharts → Gemini/Groq → report/alert.
 - End card: “Multi-tenant data product · Full case study.”
 
-### Video 2: Job Hunter Agent
+### Video 2: Catalog Reconciliation (done)
 
-- Problem: fragmented feeds and repetitive evaluation.
-- Workflow: sources fetched → duplicates removed → fit scored → grounded résumé/letter created → Telegram alert delivered.
-- Architecture: adapters → Supabase → deterministic prefilter → LLM fallback → DOCX/Telegram.
-- Include one sanitized run summary and provider telemetry view.
+- 40-second demo with sample data: load the store exports, review the summary, see SKU problems, mark a price difference as reviewed, export the action list.
+- File: public/catalog-reconciliation-demo.mp4. The company, products and prices are fictional.
 
 ### Video 3: Battery Lifecycle Power BI
 
@@ -76,11 +74,10 @@ Recommended 60-second structure:
 - Add a seeded demo account and sanitized product screenshots.
 - Publish one architecture diagram and one end-to-end test screenshot.
 
-### Job Hunter Agent
+### Catalog Reconciliation
 
-- Re-enable the GitHub Actions workflow if it should be described as currently scheduled.
-- Add a monitoring screenshot covering sources, deduplication, model fallback, latency, token usage, and delivery.
-- Publish a sanitized example of generated output.
+- Connect the Wix API (read-only app, key in NetSuite API Secrets) and update the case study when it runs on a schedule.
+- Keep every screenshot and video on sample data only.
 
 ### Battery Lifecycle Power BI
 

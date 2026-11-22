@@ -75,47 +75,47 @@ function FocusArtwork({ copy }: { copy: UiCopy }) {
   );
 }
 
-function AgentArtwork({ copy }: { copy: UiCopy }) {
+function ReconcileArtwork({ copy }: { copy: UiCopy }) {
   return (
     <div className="art-agent">
       <div className="art-agent__top">
-        <span>run_archive_0248</span>
-        <em>● {copy.artwork.historical}</em>
+        <span>erp_vs_store_check</span>
+        <em>● {copy.artwork.lastCheck}</em>
       </div>
       <div className="art-agent__flow">
         <div>
           <small>01</small>
-          <strong>{copy.artwork.fetch}</strong>
-          <span>{copy.artwork.multiSource}</span>
+          <strong>ERP</strong>
+          <span>{copy.artwork.itemsPrices}</span>
         </div>
         <i>→</i>
         <div>
           <small>02</small>
-          <strong>{copy.artwork.score}</strong>
-          <span>{copy.artwork.llmChain}</span>
+          <strong>{copy.artwork.store}</strong>
+          <span>{copy.artwork.productExport}</span>
         </div>
         <i>→</i>
         <div>
           <small>03</small>
-          <strong>{copy.artwork.tailor}</strong>
-          <span>DOCX</span>
+          <strong>{copy.artwork.match}</strong>
+          <span>{copy.artwork.skuRules}</span>
         </div>
       </div>
       <div className="art-agent__log">
         <span>
-          <b>Gemini</b>
+          <b>{copy.artwork.fixNow}</b>
+          <i className="log-bar" style={{ width: "46%" }} />
+          16
+        </span>
+        <span>
+          <b>{copy.artwork.review}</b>
+          <i className="log-bar" style={{ width: "24%" }} />
+          6
+        </span>
+        <span>
+          <b>{copy.artwork.ok}</b>
           <i className="log-bar log-bar--long" />
-          scored
-        </span>
-        <span>
-          <b>Groq</b>
-          <i className="log-bar log-bar--mid" />
-          {copy.artwork.fallback}
-        </span>
-        <span>
-          <b>Output</b>
-          <i className="log-bar log-bar--short" />
-          {copy.artwork.verified}
+          71
         </span>
       </div>
     </div>
@@ -260,7 +260,7 @@ export function ProjectArtwork({ visual, compact = false, copy }: ProjectArtwork
       aria-hidden="true"
     >
       {visual === "focus" ? <FocusArtwork copy={copy} /> : null}
-      {visual === "agent" ? <AgentArtwork copy={copy} /> : null}
+      {visual === "reconcile" ? <ReconcileArtwork copy={copy} /> : null}
       {visual === "battery" ? <BatteryArtwork copy={copy} /> : null}
       {visual === "excel" ? <ExcelArtwork copy={copy} /> : null}
     </div>

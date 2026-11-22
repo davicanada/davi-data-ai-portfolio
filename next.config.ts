@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async redirects() {
+    return [
+      { source: "/work/job-hunter-agent", destination: "/work/catalog-reconciliation", permanent: false },
+      { source: "/:locale(fr|es|pt)/work/job-hunter-agent", destination: "/:locale/work/catalog-reconciliation", permanent: false },
+    ];
+  },
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },

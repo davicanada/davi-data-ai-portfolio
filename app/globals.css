@@ -1762,9 +1762,9 @@ h3 {
   height: 80px;
 }
 
-/* Agent visual */
+/* Reconciliation visual */
 
-.project-artwork--agent {
+.project-artwork--reconcile {
   background:
     radial-gradient(circle at 18% 10%, rgba(114, 212, 255, 0.18), transparent 28%),
     #071421;

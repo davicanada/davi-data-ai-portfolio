@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { ProjectArtwork } from "@/components/project-artwork";
 import { FocusVideo } from "@/components/focus-video";
+import { ProjectVideo } from "@/components/project-video";
 import { getNextProject, getProject } from "@/lib/projects";
 import { LocaleShell } from "@/components/locale-shell";
 import { localizedPath, ui, type Locale } from "@/lib/i18n";
@@ -129,6 +130,7 @@ export function ProjectPage({ slug, locale }: { slug: string; locale: Locale }) 
       </section>
 
       {isFocusProject ? <FocusVideo copy={copy} /> : null}
+      {project.video ? <ProjectVideo video={project.video} fallback={copy.focus.videoFallback} /> : null}
 
       {project.embed ? (
         <section className="case-embed section-shell section-padding" aria-labelledby="live-report-title">
